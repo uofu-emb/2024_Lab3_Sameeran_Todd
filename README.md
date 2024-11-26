@@ -32,6 +32,7 @@
     The shared resource counter is accessed and modified in both main_thread and side_thread without protection.
 
     Changes made to protect access
+    ```
     void side_thread(void *params) {
         while (1) {
             vTaskDelay(100);
@@ -55,13 +56,13 @@
             vTaskDelay(100);
         }
     }
-
-
+```
 2. Is the critical section starving the system? If so, make modifications to prevent starving the system.
 > Starving
     Since the tasks execute quickly within their critical sections, so starvation is unlikely under normal conditions.
 
     Changes made to to prevent starvation
+    ```
     void side_thread(void *params) {
         while (1) {
             vTaskDelay(100);
@@ -74,7 +75,7 @@
         }
     }
 
-
+```
 ## Testing threaded code
 Testing threaded coded is hard. Our test methodology so far relies on one execution context.
 1. If we wanted to run multiple threads during a test, our test would need some way to synchronize the state of the threads with the test.
@@ -93,7 +94,7 @@ Testing threaded coded is hard. Our test methodology so far relies on one execut
 1. Don't forget to commit as you go.
 
 Initial test code
-
+```
 #include <stdio.h>
 #include <pico/stdlib.h>
 #include <stdint.h>
@@ -119,8 +120,8 @@ Initial test code
             return pdFALSE; // Failed to acquire semaphore
         }
     }
-
-
+```
+```
 // Test function for increment_counter
     void test_increment_counter() {
         // Setup
@@ -149,7 +150,7 @@ int main(void) {
     test_increment_counter();
     return 0;
 }
-
+```
 # Deadlock.
 __Deadlock__ is a condition when one thread holds a lock and is incapable of releasing it.
 Let's examine two possible cases of deadlock.
@@ -159,7 +160,7 @@ One thread has lock A, and is waiting for a lock B. The other thread holds lock 
 
 ### Activity 4
 1. Write code that creates this situation.
-
+```
     int unorphaned_lock(SemaphoreHandle_t semaphore, TickType_t timeout, int *counter)
     {
             if (xSemaphoreTake(semaphore, timeout) == pdFALSE)
@@ -173,11 +174,11 @@ One thread has lock A, and is waiting for a lock B. The other thread holds lock 
         xSemaphoreGive(semaphore);
         return pdTRUE;
     }
-
+```
 2. Write a test that shows this code will lock.
     1. You'll need to have your test wait for a short period of time, suspend the task with `vTaskSuspend`, check the state of the threads, and then kill them with `vTaskDelete`.
     1. Hint: you might find it useful to pass semaphores or other data into the thread with the  `pvParameters` pointer passed to the thread entry function. If you need to group multiple pieces of data together, that's why we have structs!
-
+```
     void test_unorphaned(void)
     {
         int counter = 1;
@@ -194,8 +195,7 @@ One thread has lock A, and is waiting for a lock B. The other thread holds lock 
         TEST_ASSERT_EQUAL_INT(pdTRUE, result);
         TEST_ASSERT_EQUAL_INT(1, uxSemaphoreGetCount(semaphore));
     }
-
-   
+```
 ## Case 2, the orphaned lock.
 A thread acquires a lock but fails to properly release it.
 ```
@@ -217,7 +217,7 @@ A thread acquires a lock but fails to properly release it.
 2. Write a test showing the thread will deadlock.
     1. Recall your test will need to kill the deadlocked threads before it can complete.
 3. Create a new version of the code that will not deadlock.
-
+```
     int orphaned_lock(SemaphoreHandle_t semaphore, TickType_t timeout, int *counter)
     {
         if (xSemaphoreTake(semaphore, timeout) == pdFALSE)
@@ -232,7 +232,7 @@ A thread acquires a lock but fails to properly release it.
         xSemaphoreGive(semaphore);
         return pdTRUE;
     }
-
+```
 4. Write a test showing the thread will not deadlock.
 ```
     void test_orphaned(void)
