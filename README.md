@@ -234,7 +234,7 @@ A thread acquires a lock but fails to properly release it.
     }
 
 4. Write a test showing the thread will not deadlock.
-
+```
     void test_orphaned(void)
     {
         int counter = 1;
@@ -255,3 +255,4 @@ A thread acquires a lock but fails to properly release it.
         TEST_ASSERT_EQUAL_INT(pdFALSE, result);
         TEST_ASSERT_EQUAL_INT(0, uxSemaphoreGetCount(semaphore));
     }
+```
