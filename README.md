@@ -32,7 +32,7 @@
     The shared resource counter is accessed and modified in both main_thread and side_thread without protection.
 
     Changes made to protect access
-    ```
+```
     void side_thread(void *params) {
         while (1) {
             vTaskDelay(100);
@@ -62,7 +62,7 @@
     Since the tasks execute quickly within their critical sections, so starvation is unlikely under normal conditions.
 
     Changes made to to prevent starvation
-    ```
+```
     void side_thread(void *params) {
         while (1) {
             vTaskDelay(100);
