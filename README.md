@@ -92,6 +92,64 @@ Testing threaded coded is hard. Our test methodology so far relies on one execut
     1. xSemaphoreTake returns a status code, don't forget to check it.
 1. Don't forget to commit as you go.
 
+Initial test code
+
+#include <stdio.h>
+#include <pico/stdlib.h>
+#include <stdint.h>
+#include <unity.h>
+#include "unity_config.h"
+#include <assert.h>
+#include <FreeRTOS.h>
+#include <semphr.h>
+
+
+BaseType_t increment_counter(SemaphoreHandle_t semaphore, int *counter, int increment) {
+    // Validate parameters
+    if (semaphore == NULL || counter == NULL) {
+        return pdFALSE; // Invalid arguments
+    }
+
+    // Try to acquire the semaphore
+    if (xSemaphoreTake(semaphore, pdMS_TO_TICKS(50)) == pdTRUE) {
+        *counter += increment; // Increment counter
+        xSemaphoreGive(semaphore); // Release semaphore
+        return pdTRUE; // Success
+    } else {
+        return pdFALSE; // Failed to acquire semaphore
+    }
+}
+
+
+// Test function for increment_counter
+void test_increment_counter() {
+    // Setup
+    SemaphoreHandle_t test_semaphore = xSemaphoreCreateCounting(1, 1);
+    int test_counter = 0;
+
+    // Test successful increment
+    BaseType_t result = increment_counter(test_semaphore, &test_counter, 5);
+    assert(result == pdTRUE); // Ensure the function succeeded
+    assert(test_counter == 5); // Ensure counter updated correctly
+
+    // Test failure due to semaphore timeout
+    xSemaphoreTake(test_semaphore, 0); // Lock semaphore
+    result = increment_counter(test_semaphore, &test_counter, 3);
+    assert(result == pdFALSE); // Ensure the function failed
+    assert(test_counter == 5); // Ensure counter was not updated
+
+    printf("All tests passed.\n");
+
+    // Cleanup
+    vSemaphoreDelete(test_semaphore);
+}
+
+// Main function for running tests
+int main(void) {
+    test_increment_counter();
+    return 0;
+}
+
 # Deadlock.
 __Deadlock__ is a condition when one thread holds a lock and is incapable of releasing it.
 Let's examine two possible cases of deadlock.
@@ -101,10 +159,43 @@ One thread has lock A, and is waiting for a lock B. The other thread holds lock 
 
 ### Activity 4
 1. Write code that creates this situation.
+
+int unorphaned_lock(SemaphoreHandle_t semaphore, TickType_t timeout, int *counter)
+{
+    if (xSemaphoreTake(semaphore, timeout) == pdFALSE)
+        return pdFALSE;
+    {
+        (*counter)++;
+        if (!(*counter % 2)) {
+            printf("Count %d\n", *counter);
+        }
+    }
+    xSemaphoreGive(semaphore);
+    return pdTRUE;
+}
+
 2. Write a test that shows this code will lock.
     1. You'll need to have your test wait for a short period of time, suspend the task with `vTaskSuspend`, check the state of the threads, and then kill them with `vTaskDelete`.
     1. Hint: you might find it useful to pass semaphores or other data into the thread with the  `pvParameters` pointer passed to the thread entry function. If you need to group multiple pieces of data together, that's why we have structs!
 
+void test_unorphaned(void)
+{
+    int counter = 1;
+    SemaphoreHandle_t semaphore = xSemaphoreCreateCounting(1, 1);
+
+    int result;
+    result = unorphaned_lock(semaphore, 500, &counter);
+    TEST_ASSERT_EQUAL_INT(2, counter);
+    TEST_ASSERT_EQUAL_INT(pdTRUE, result);
+    TEST_ASSERT_EQUAL_INT(1, uxSemaphoreGetCount(semaphore));
+
+    result = unorphaned_lock(semaphore, 500, &counter);
+    TEST_ASSERT_EQUAL_INT(3, counter);
+    TEST_ASSERT_EQUAL_INT(pdTRUE, result);
+    TEST_ASSERT_EQUAL_INT(1, uxSemaphoreGetCount(semaphore));
+}
+
+   
 ## Case 2, the orphaned lock.
 A thread acquires a lock but fails to properly release it.
 ```
@@ -126,4 +217,41 @@ void orphaned_lock(void)
 2. Write a test showing the thread will deadlock.
     1. Recall your test will need to kill the deadlocked threads before it can complete.
 3. Create a new version of the code that will not deadlock.
+
+int orphaned_lock(SemaphoreHandle_t semaphore, TickType_t timeout, int *counter)
+{
+    if (xSemaphoreTake(semaphore, timeout) == pdFALSE)
+        return pdFALSE;
+    {
+        (*counter)++;
+        if (*counter % 2) {
+            return 0;
+        }
+        printf("Count %d\n", *counter);
+    }
+    xSemaphoreGive(semaphore);
+    return pdTRUE;
+}
+
 4. Write a test showing the thread will not deadlock.
+
+void test_orphaned(void)
+{
+    int counter = 1;
+    SemaphoreHandle_t semaphore = xSemaphoreCreateCounting(1, 1);
+
+    int result = orphaned_lock(semaphore, 500, &counter);
+    TEST_ASSERT_EQUAL_INT(2, counter);
+    TEST_ASSERT_EQUAL_INT(pdTRUE, result);
+    TEST_ASSERT_EQUAL_INT(1, uxSemaphoreGetCount(semaphore));
+
+    result = orphaned_lock(semaphore, 500, &counter);
+    TEST_ASSERT_EQUAL_INT(3, counter);
+    TEST_ASSERT_EQUAL_INT(pdFALSE, result);
+    TEST_ASSERT_EQUAL_INT(0, uxSemaphoreGetCount(semaphore));
+
+    result = orphaned_lock(semaphore, 500, &counter);
+    TEST_ASSERT_EQUAL_INT(3, counter);
+    TEST_ASSERT_EQUAL_INT(pdFALSE, result);
+    TEST_ASSERT_EQUAL_INT(0, uxSemaphoreGetCount(semaphore));
+}

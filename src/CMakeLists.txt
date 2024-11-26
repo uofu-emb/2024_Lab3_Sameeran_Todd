@@ -1,8 +1,8 @@
 # This is the main binary. List your C files here.
 add_executable(lab03
-    # main.c
-    # loop.c
-    threads.c
+     main.c
+     loop.c
+    #threads.c
     )
 
 pico_set_program_name(lab03 "lab03")
