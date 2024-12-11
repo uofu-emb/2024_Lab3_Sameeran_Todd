@@ -1,36 +1,3 @@
-[![CMake](https://github.com/uofu-emb/2024_Lab3_Sameeran_Todd/actions/workflows/main.yml/badge.svg?branch=dev)](https://github.com/uofu-emb/2024_Lab3_Sameeran_Todd/actions/workflows/main.yml)
-# Lab 3 Threads and shared state.
-# Activity 0
-1. Create a new project.
-2. Copy in the thread.c example file. Commit.
-3. Identify the execution contexts in the program, and their entry points.
-> Execution Contexts 
-    1. main_thread: This task toggles an LED, increments counter, and prints a message.
-    2. side_thread: This task performs a delayed update to counter and prints a message.
-4. Identify shared state between execution contexts.
-> Shared State
-    1. counter: Shared between main_thread and side_thread
-    2. on: Shared between main and main_thread
-5. Identify the semaphore.
-> Semaphore
-    1. The semaphore semaphore is created using xSemaphoreCreateCounting(1, 1)
-6. Predict the behavior of the program.
-> Behavior:
-    1. Both tasks (main_thread and side_thread) can access and modify counter simultaneously, which will lead to a race condition.  
-    2. Counter will work as intended due to the race condition
-    3. Output will also not work as intended due to the race condition
-7. Run the program and compare the output to your prediction.
-> Output 
-    hello world from main! Count -11
-    hello world from thread! Count -19
-    hello world from main! Count -19
-    hello world from thread! Count -35
-    hello world from main! Count -35
-    This is basically what we predicted
-### Activity 1
-1. Are all uses of the shared resources in protected critical sections? Make any modifications necessary to protect the critical sections.
-> Protected Critical Sections
-    The shared resource counter is accessed and modified in both main_thread and side_thread without protection.
 
 ```
     //Changes made to protect access
