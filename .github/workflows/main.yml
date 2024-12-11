@@ -7,31 +7,18 @@ env:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64]
     steps:
-      - name: Install GCC
-        id: arm-none-eabi-gcc-action
-        uses: carlosperate/arm-none-eabi-gcc-action@v1
-        with:
-          release: '13.2.Rel1'
-
       - name: Clean workspace
         run: |
           echo "Cleaning up previous run"
           rm -rf "${{ github.workspace }}"
           mkdir -p "${{ github.workspace }}"
 
-      - name: Checkout pico-sdk/develop
-        uses: actions/checkout@v2
-        with:
-          repository: raspberrypi/pico-sdk
-          ref: master
-          path: ${{github.workspace}}/pico_sdk
-          submodules: true
-
       - uses: actions/checkout@v3
         with:
           path: ${{github.workspace}}/source
+          submodules: 'true'
 
       - name: Create Build Environment
         # Some projects don't allow in-source building, so create a separate build directory
@@ -47,7 +34,7 @@ jobs:
         # Note the current convention is to use the -S and -B options here to specify source
         # and build directories, but this is only available with CMake 3.13 and higher.
         # The CMake binaries on the Github Actions machines are (as of this writing) 3.12
-        run: PICO_SDK_PATH=${{github.workspace}}/pico_sdk PICO_TOOLCHAIN_PATH=${{ steps.arm-none-eabi-gcc-action.outputs.path }} cmake -DCMAKE_BUILD_TYPE=$BUILD_TYPE -B ./build ./source
+        run:  cmake -DCMAKE_BUILD_TYPE=$BUILD_TYPE -B ./build ./source
 
       - name: Build
         working-directory: ${{github.workspace}}
