@@ -1,4 +1,4 @@
-[![CMake](https://github.com/uofu-emb/2024_Lab3_Sameeran_Todd/actions/workflows/main.yml/badge.svg?branch=dev)](https://github.com/uofu-emb/2024_Lab3_Sameeran_Todd/actions/workflows/main.yml)
+[![CMake](https://github.com/uofu-emb/2024_Lab3_Sameeran_Todd/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/uofu-emb/2024_Lab3_Sameeran_Todd/actions/workflows/main.yml)
 # Lab 3 Threads and shared state.
 # Activity 0
 1. Create a new project.
