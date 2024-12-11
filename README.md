@@ -1,4 +1,3 @@
-![example workflow](https://github.com/uofu-emb/2024_Lab3_Sameeran_Todd/actions/workflows/main.yml/badge.svg)
 [![CMake](https://github.com/uofu-emb/2024_Lab3_Sameeran_Todd/actions/workflows/main.yml/badge.svg?branch=dev)](https://github.com/uofu-emb/2024_Lab3_Sameeran_Todd/actions/workflows/main.yml)
 # Lab 3 Threads and shared state.
 # Activity 0
