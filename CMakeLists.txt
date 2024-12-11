@@ -57,8 +57,8 @@ include(${PICO_SDK_PATH}/pico_sdk_init.cmake)
 # This imports the library configuration for FreeRTOS
 include(${FREERTOS_PATH}/portable/ThirdParty/GCC/RP2040/FreeRTOS_Kernel_import.cmake)
 
-add_subdirectory(${FREERTOS_PATH}/lib/freertos)
-include(${FREERTOS_PATH}/lib/freertos/portable/ThirdParty/GCC/RP2040/FreeRTOS_Kernel_import.cmake)
+add_subdirectory(${FREERTOS_PATH})
+include(${FREERTOS_PATH}/portable/ThirdParty/GCC/RP2040/FreeRTOS_Kernel_import.cmake)
 
 
 # This sets up the unity library. They don't provide a library export, so it's defined locally.
