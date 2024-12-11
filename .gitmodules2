@@ -1,0 +1,9 @@
+#git submodule add https://github.com/raspberrypi/pico-sdk.git lib/pico-sdk
+#git submodule add https://git@github.com/FreeRTOS/FreeRTOS-Kernel.git lib/freertos
+#git submodule add https://github.com/ThrowTheSwitch/Unity.git lib/unity
+#git submodule update --init --recursive
+#sudo /Users/toddnielsen/.pico-sdk/picotool/2.0.0/picotool/pictool load /Users/toddnielsen/Desktop/rtos.template-main/build/src/hello_freertos.elf -fx
+
+#sudo /Users/toddnielsen/.pico-sdk/picotool/2.0.0/picotool/picotool load /Users/toddnielsen/ECE_6785/2024_Lab3_Sameeran_Todd/build/src/lab03.elf -fx
+#sudo /Users/toddnielsen/.pico-sdk/picotool/2.0.0/picotool/picotool load /Users/toddnielsen/ECE_6785/lab_10/build/src/hello_freertos.elf -fx
+#sudo /Users/toddnielsen/.pico-sdk/picotool/2.0.0/picotool/picotool load /Users/toddnielsen/ECE_6785/2024-lab06-Tharnath-Todd/build/src/hello_freertos.elf -fx
